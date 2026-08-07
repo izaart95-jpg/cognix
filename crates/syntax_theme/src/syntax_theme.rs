@@ -1,3 +1,5 @@
+// change if err in gui
+
 #![allow(missing_docs)]
 
 use std::{
@@ -219,8 +221,8 @@ mod bundled_themes {
         /// Load the "One Dark" syntax theme from the bundled theme JSON.
         pub fn one_dark() -> Arc<Self> {
             load_theme(
-                include_str!("../../../assets/themes/one/one.json"),
-                "One Dark",
+                include_str!("../../../assets/themes/dracula/catppuccin_no_blur.json"),
+                "Catppuccin Mocha",
             )
         }
     }

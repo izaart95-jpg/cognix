@@ -2129,6 +2129,20 @@ pub fn watch_user_agents_md(fs: Arc<dyn fs::Fs>, cx: &mut App) {
 pub fn watch_settings_files(fs: Arc<dyn fs::Fs>, cx: &mut App) {
     MigrationNotification::set_global(cx.new(|_| MigrationNotification), cx);
 
+    {
+        let fs = fs.clone();
+        cx.spawn(async move |_cx| {
+            let path = paths::settings_file();
+            if !fs.is_file(path).await {
+                let default_content = settings::initial_user_settings_content();
+                fs.save(path, &default_content.as_ref().into(), Default::default())
+                    .await
+                    .log_err();
+            }
+        })
+        .detach();
+    }
+
     SettingsStore::update_global(cx, move |store, cx| {
         store.watch_settings_files(fs, cx, |settings_file, result, cx| {
             let is_user = matches!(settings_file, SettingsFile::User);
@@ -5878,7 +5892,7 @@ mod tests {
         for theme_name in themes.list().into_iter().map(|meta| meta.name) {
             let theme = themes.get(&theme_name).unwrap();
             assert_eq!(theme.name, theme_name);
-            if theme.name.as_ref() == "One Dark" {
+            if theme.name.as_ref() == "Catppuccin Mocha" {
                 has_default_theme = true;
             }
         }

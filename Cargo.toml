@@ -8,6 +8,8 @@ members = [
     "crates/agent",
     "crates/agent_servers",
     "crates/agent_settings",
+    "crates/llama_cpp_clone",
+    "crates/g4f",
     "crates/agent_skills",
     "crates/agent_ui",
     "crates/ai_onboarding",
@@ -393,6 +395,8 @@ line_ending_selector = { path = "crates/line_ending_selector" }
 livekit_api = { path = "crates/livekit_api" }
 livekit_client = { path = "crates/livekit_client" }
 llama_cpp = { path = "crates/llama_cpp" }
+llama_cpp_clone = { path = "crates/llama_cpp_clone" }
+g4f = { path = "crates/g4f" } 
 lmstudio = { path = "crates/lmstudio" }
 lsp = { path = "crates/lsp" }
 lsp_locations = { path = "crates/lsp_locations" }
@@ -1036,6 +1040,8 @@ journal = { codegen-units = 1 }
 json_schema_store = { codegen-units = 1 }
 llama_cpp = { codegen-units = 1 }
 lmstudio = { codegen-units = 1 }
+llama_cpp_clone = { codegen-units = 1 }
+g4f = { codegen-units = 1 }
 menu = { codegen-units = 1 }
 notifications = { codegen-units = 1 }
 ollama = { codegen-units = 1 }

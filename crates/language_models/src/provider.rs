@@ -11,6 +11,8 @@ pub mod copilot_chat;
 pub mod deepseek;
 pub mod google;
 pub mod llama_cpp;
+pub mod llama_cpp_clone;
+pub mod g4f;
 pub mod lmstudio;
 pub mod mistral;
 pub mod ollama;

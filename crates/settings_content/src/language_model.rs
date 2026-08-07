@@ -17,6 +17,10 @@ pub struct AllLanguageModelSettingsContent {
     pub google: Option<GoogleSettingsContent>,
     #[serde(rename = "llama.cpp")]
     pub llama_cpp: Option<LlamaCppSettingsContent>,
+    #[serde(rename = "cognix.glm")]
+    pub llama_cpp_clone: Option<LlamaCppCloneSettingsContent>,
+    #[serde(rename = "g4f")]
+    pub g4f: Option<G4fSettingsContent>,
     pub lmstudio: Option<LmStudioSettingsContent>,
     pub mistral: Option<MistralSettingsContent>,
     pub ollama: Option<OllamaSettingsContent>,
@@ -336,6 +340,32 @@ pub struct LlamaCppAvailableModel {
     pub supports_images: Option<bool>,
     /// Whether the model emits reasoning/thinking content.
     pub supports_thinking: Option<bool>,
+}
+
+#[with_fallible_options]
+#[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
+pub struct LlamaCppCloneSettingsContent {
+    pub api_url: Option<String>,
+    /// Whether to automatically discover models served by the server.
+    /// Defaults to true.
+    pub auto_discover: Option<bool>,
+    pub available_models: Option<Vec<LlamaCppAvailableModel>>,
+    /// Overrides the context length reported for every model.
+    pub context_window: Option<u64>,
+    pub custom_headers: Option<HashMap<String, String>>,
+}
+
+#[with_fallible_options]
+#[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
+pub struct G4fSettingsContent {
+    pub api_url: Option<String>,
+    /// Whether to automatically discover models served by the server.
+    /// Defaults to true.
+    pub auto_discover: Option<bool>,
+    pub available_models: Option<Vec<LlamaCppAvailableModel>>,
+    /// Overrides the context length reported for every model.
+    pub context_window: Option<u64>,
+    pub custom_headers: Option<HashMap<String, String>>,
 }
 
 #[with_fallible_options]

@@ -29,6 +29,7 @@ pub enum IconName {
     AiVercel,
     AiXAi,
     AiZed,
+    Cognix,
     Archive,
     ArrowCircle,
     ArrowDown,

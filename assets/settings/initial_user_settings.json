@@ -7,11 +7,22 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "language_models": {
+   "cognix.glm": {
+      "api_url": "https://api.lelouch.indevs.in"
+   },
+   "g4f": {
+      "api_url": "https://g4f.space"
+    }
+  },
+  "title_bar": {
+    "show_sign_in": false
+  },
   "ui_font_size": 16,
   "buffer_font_size": 15,
   "theme": {
     "mode": "system",
-    "light": "One Light",
-    "dark": "One Dark",
+    "light": "Catppuccin Latte",
+    "dark": "Catppuccin Mocha",
   },
 }
