@@ -8,8 +8,10 @@ pub mod api_compatible;
 pub mod bedrock;
 pub mod cloud;
 pub mod copilot_chat;
+pub mod custom_providers;
 pub mod deepseek;
 pub mod google;
+pub mod kilo;
 pub mod llama_cpp;
 pub mod lmstudio;
 pub mod mistral;
@@ -17,11 +19,12 @@ pub mod ollama;
 pub mod open_ai;
 pub mod open_ai_compatible;
 pub mod open_router;
+pub mod openai_shim;
 pub mod openai_subscribed;
 pub mod opencode;
-
 pub mod vercel_ai_gateway;
 pub mod x_ai;
+pub mod zen;
 
 const COMMON_RESERVED_HEADER_NAMES: &[&str] = &["Authorization", "Content-Type", "Accept"];
 

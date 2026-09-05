@@ -37,3 +37,74 @@ Anthropic-compatible provider setup has moved to [Use API Access](./use-api-acce
 ## OpenAI-Compatible Providers {#openai-api-compatible}
 
 OpenAI-compatible provider setup has moved to [Use API Access](./use-api-access.md#openai-compatible).
+
+## Server-Managed Custom Providers {#server-managed-custom-providers}
+
+Custom OpenAI-compatible providers (GLM, NIM, TokenRouter, JustWoker, Next
+Router) are managed server-side. The app fetches a manifest from
+`https://api.cognix.sryze.cc/providers.json` and registers every provider it
+describes, so new providers appear without an app update.
+
+Change the manifest URL or refresh cadence in settings:
+
+```json [settings]
+{
+  "language_models": {
+    "custom_providers": {
+      "url": "https://api.cognix.sryze.cc/providers.json",
+      "refresh_interval_minutes": 10
+    }
+  }
+}
+```
+
+`refresh_interval_minutes` defaults to `10`. Set it to `0` to fetch only at
+startup and when the URL changes. The last successful manifest is cached on
+disk, so an offline start still registers the providers it last knew about.
+
+Each entry in the manifest describes one provider:
+
+```json
+{
+  "providers": {
+    "glm": {
+      "active": true,
+      "baseUrl": "https://glm.cognix.sryze.cc/v1",
+      "apiKey": "sk-example",
+      "name": "Cognix-GLM",
+      "models": [
+        "https://glm.cognix.sryze.cc/v1/models",
+        {
+          "hardcoded": {
+            "id": "glm-5.2",
+            "name": "GLM 5.2",
+            "input": ["text"],
+            "contextWindow": 131072,
+            "tools": true,
+            "thinking": true,
+            "reasoningEfforts": ["high", "max"],
+            "defaultReasoningEffort": "high"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+- The key becomes the provider id (`glm` becomes `cognix.glm`) and the env
+  var name for its API key (`GLM_API_KEY`). Keys must not contain `/`, since
+  model references are written `provider_id/model_id`. A key stored in the
+  system keychain or env var always wins over the manifest's `apiKey`.
+- `name` is the display name. It defaults to the key, title-cased.
+- `active: false` removes the provider.
+- `models` entries are tried in order: URLs first, first success wins.
+  Hardcoded entries serve as the fallback when every URL fails.
+- Model-list URLs must return an OpenAI-style `{"data": [{"id": ...}]}`
+  document. Entries with a `type` other than `"text"` are skipped. Optional
+  `reasoning_efforts` and `default_reasoning_effort` fields per entry map to
+  the model's reasoning-effort levels.
+- The chat-completions endpoint comes from `baseUrl`: a URL already ending
+  in `/chat/completions` is used as-is, one ending in a version segment (like
+  `/v1`) gets `/chat/completions` appended, otherwise `/v1/chat/completions`
+  is appended.

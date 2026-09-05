@@ -20,6 +20,7 @@ use crate::provider::bedrock::BedrockLanguageModelProvider;
 use crate::provider::cloud::CloudLanguageModelProvider;
 use crate::provider::copilot_chat::CopilotChatLanguageModelProvider;
 use crate::provider::google::GoogleLanguageModelProvider;
+use crate::provider::kilo::KiloLanguageModelProvider;
 use crate::provider::llama_cpp::LlamaCppLanguageModelProvider;
 use crate::provider::lmstudio::LmStudioLanguageModelProvider;
 pub use crate::provider::mistral::MistralLanguageModelProvider;
@@ -31,14 +32,17 @@ use crate::provider::openai_subscribed::OpenAiSubscribedProvider;
 use crate::provider::opencode::OpenCodeLanguageModelProvider;
 use crate::provider::vercel_ai_gateway::VercelAiGatewayLanguageModelProvider;
 use crate::provider::x_ai::XAiLanguageModelProvider;
+use crate::provider::zen::ZenLanguageModelProvider;
 pub use crate::settings::*;
 
 pub fn init(user_store: Entity<UserStore>, client: Arc<Client>, cx: &mut App) {
     let credentials_provider = client.credentials_provider();
     let registry = LanguageModelRegistry::global(cx);
+    let registry_entity = registry.clone();
     registry.update(cx, |registry, cx| {
         register_language_model_providers(
             registry,
+            registry_entity,
             user_store,
             client.clone(),
             credentials_provider.clone(),
@@ -215,6 +219,7 @@ fn register_compatible_providers(
 
 fn register_language_model_providers(
     registry: &mut LanguageModelRegistry,
+    registry_entity: Entity<LanguageModelRegistry>,
     user_store: Entity<UserStore>,
     client: Arc<Client>,
     credentials_provider: Arc<dyn CredentialsProvider>,
@@ -266,6 +271,18 @@ fn register_language_model_providers(
             credentials_provider.clone(),
             cx,
         )),
+        cx,
+    );
+    registry.register_provider(
+        Arc::new(ZenLanguageModelProvider::new(
+            client.http_client(),
+            credentials_provider.clone(),
+            cx,
+        )),
+        cx,
+    );
+    registry.register_provider(
+        Arc::new(KiloLanguageModelProvider::new(client.http_client(), cx)),
         cx,
     );
     registry.register_provider(
@@ -336,9 +353,18 @@ fn register_language_model_providers(
     registry.register_provider(
         Arc::new(OpenAiSubscribedProvider::new(
             client.http_client(),
-            credentials_provider,
+            credentials_provider.clone(),
             cx,
         )),
+        cx,
+    );
+
+    // Dynamic custom providers are registered last so manifest keys
+    // colliding with a built-in provider id can be detected.
+    provider::custom_providers::init(
+        registry_entity,
+        client.http_client(),
+        credentials_provider,
         cx,
     );
 }

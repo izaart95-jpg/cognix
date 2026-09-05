@@ -1,0 +1,29 @@
+[package]
+name = "custom_providers"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/custom_providers.rs"
+
+[features]
+default = []
+schemars = ["dep:schemars", "openai_protocol/schemars"]
+
+[dependencies]
+anyhow.workspace = true
+futures.workspace = true
+http_client.workspace = true
+log.workspace = true
+openai_protocol.workspace = true
+schemars = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+http_client = { workspace = true, features = ["test-support"] }

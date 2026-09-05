@@ -1,197 +1,28 @@
+pub use openai_protocol::{
+    CHAT_COMPLETIONS_PATH, ChatCompletionRequest, ChatMessage, ChoiceDelta, ErrorEnvelope,
+    FunctionChunk, FunctionContent, FunctionDefinition, ImageUrl, MessageContent, MessagePart,
+    Model, ResponseMessageDelta, ResponseStreamEvent, ResponseStreamResult, StreamOptions,
+    ToolCall, ToolCallChunk, ToolCallContent, ToolChoice, ToolDefinition, Usage, get_json,
+};
+
 use anyhow::{Context as _, Result, anyhow};
 use futures::{AsyncBufReadExt, AsyncReadExt, StreamExt, io::BufReader, stream::BoxStream};
 use http_client::{
     AsyncBody, CustomHeaders, HttpClient, HttpRequestExt, Method, Request as HttpRequest,
-    RequestBuilderExt, http,
+    RequestBuilderExt,
 };
-pub use language_model_core::chat_completion::{
-    ChoiceDelta, FunctionChunk, ResponseMessageDelta, ResponseStreamError, ResponseStreamEvent,
-    ResponseStreamResult, ToolCallChunk, Usage,
-};
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use openai_protocol::ProviderSpec;
+use serde::Deserialize;
+use std::borrow::Cow;
 use url::Url;
 
 pub const LLAMA_CPP_API_URL: &str = "http://localhost:8080";
 
-const DEFAULT_CONTEXT_LENGTH: u64 = 4096;
-
-/// A model exposed to the rest of Zed, after merging API discovery with
-/// user-configured overrides.
-#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
-pub struct Model {
-    pub name: String,
-    pub display_name: Option<String>,
-    pub max_tokens: u64,
-    pub supports_tools: bool,
-    pub supports_images: bool,
-    pub supports_thinking: bool,
-}
-
-impl Model {
-    pub fn new(
-        name: &str,
-        display_name: Option<&str>,
-        max_tokens: Option<u64>,
-        supports_tools: bool,
-        supports_images: bool,
-        supports_thinking: bool,
-    ) -> Self {
-        Self {
-            name: name.to_owned(),
-            display_name: display_name.map(ToString::to_string),
-            max_tokens: max_tokens.unwrap_or(DEFAULT_CONTEXT_LENGTH),
-            supports_tools,
-            supports_images,
-            supports_thinking,
-        }
-    }
-
-    pub fn display_name(&self) -> &str {
-        self.display_name.as_deref().unwrap_or(&self.name)
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum ToolChoice {
-    Auto,
-    Required,
-    None,
-}
-
-#[derive(Clone, Deserialize, Serialize, Debug)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum ToolDefinition {
-    Function { function: FunctionDefinition },
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct FunctionDefinition {
-    pub name: String,
-    pub description: Option<String>,
-    pub parameters: Option<Value>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = "role", rename_all = "lowercase")]
-pub enum ChatMessage {
-    Assistant {
-        #[serde(default)]
-        content: Option<MessageContent>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        reasoning_content: Option<String>,
-        #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        tool_calls: Vec<ToolCall>,
-    },
-    User {
-        content: MessageContent,
-    },
-    System {
-        content: MessageContent,
-    },
-    Tool {
-        content: MessageContent,
-        tool_call_id: String,
-    },
-}
-
-#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
-#[serde(untagged)]
-pub enum MessageContent {
-    Plain(String),
-    Multipart(Vec<MessagePart>),
-}
-
-impl MessageContent {
-    pub fn push_part(&mut self, part: MessagePart) {
-        match self {
-            MessageContent::Plain(text) => {
-                *self =
-                    MessageContent::Multipart(vec![MessagePart::Text { text: text.clone() }, part]);
-            }
-            MessageContent::Multipart(parts) if parts.is_empty() => match part {
-                MessagePart::Text { text } => *self = MessageContent::Plain(text),
-                MessagePart::Image { .. } => *self = MessageContent::Multipart(vec![part]),
-            },
-            MessageContent::Multipart(parts) => parts.push(part),
-        }
-    }
-}
-
-impl From<Vec<MessagePart>> for MessageContent {
-    fn from(mut parts: Vec<MessagePart>) -> Self {
-        if let [MessagePart::Text { text }] = parts.as_mut_slice() {
-            MessageContent::Plain(std::mem::take(text))
-        } else {
-            MessageContent::Multipart(parts)
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum MessagePart {
-    Text {
-        text: String,
-    },
-    #[serde(rename = "image_url")]
-    Image {
-        image_url: ImageUrl,
-    },
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub struct ImageUrl {
-    pub url: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub detail: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
-pub struct ToolCall {
-    pub id: String,
-    #[serde(flatten)]
-    pub content: ToolCallContent,
-}
-
-#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
-#[serde(tag = "type", rename_all = "lowercase")]
-pub enum ToolCallContent {
-    Function { function: FunctionContent },
-}
-
-#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
-pub struct FunctionContent {
-    pub name: String,
-    pub arguments: String,
-}
-
-#[derive(Serialize, Debug)]
-pub struct ChatCompletionRequest {
-    pub model: String,
-    pub messages: Vec<ChatMessage>,
-    pub stream: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub max_tokens: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub stop: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub temperature: Option<f32>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub tools: Vec<ToolDefinition>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tool_choice: Option<ToolChoice>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub stream_options: Option<StreamOptions>,
-}
-
-/// Asks the server to include a final `usage` chunk in the stream.
-#[derive(Serialize, Debug)]
-pub struct StreamOptions {
-    pub include_usage: bool,
-}
+/// Describes how llama.cpp speaks the OpenAI chat-completions protocol.
+pub const SPEC: ProviderSpec = ProviderSpec {
+    chat_completions_path: Cow::Borrowed(CHAT_COMPLETIONS_PATH),
+    label: Cow::Borrowed("llama.cpp"),
+};
 
 /// Response of `GET /v1/models`.
 ///
@@ -444,52 +275,8 @@ pub async fn stream_chat_completion(
     request: ChatCompletionRequest,
     extra_headers: &CustomHeaders,
 ) -> Result<BoxStream<'static, Result<ResponseStreamEvent>>> {
-    let uri = format!("{api_url}/v1/chat/completions");
-    let request_builder = http::Request::builder()
-        .method(Method::POST)
-        .uri(uri)
-        .header("Content-Type", "application/json")
-        .when_some(api_key, |builder, api_key| {
-            builder.header("Authorization", format!("Bearer {api_key}"))
-        });
-
-    let request = request_builder
-        .extra_headers(extra_headers)
-        .body(AsyncBody::from(serde_json::to_string(&request)?))?;
-    let mut response = client.send(request).await?;
-    if response.status().is_success() {
-        let reader = BufReader::new(response.into_body());
-        Ok(reader
-            .lines()
-            .filter_map(|line| async move {
-                match line {
-                    Ok(line) => {
-                        let line = line.strip_prefix("data: ")?;
-                        if line == "[DONE]" {
-                            None
-                        } else {
-                            match serde_json::from_str::<ResponseStreamResult>(line) {
-                                Ok(ResponseStreamResult::Ok(response)) => Some(Ok(response)),
-                                Ok(ResponseStreamResult::Err { error }) => {
-                                    Some(Err(anyhow!(error.message)))
-                                }
-                                Err(error) => Some(Err(anyhow!(error))),
-                            }
-                        }
-                    }
-                    Err(error) => Some(Err(anyhow!(error))),
-                }
-            })
-            .boxed())
-    } else {
-        let mut body = String::new();
-        response.body_mut().read_to_string(&mut body).await?;
-        anyhow::bail!(
-            "Failed to connect to llama.cpp API: {} {}",
-            response.status(),
-            body,
-        );
-    }
+    openai_protocol::stream_chat_completion(client, api_url, api_key, request, extra_headers, &SPEC)
+        .await
 }
 
 /// Lists the models the server is serving via `GET /v1/models`.
@@ -499,28 +286,14 @@ pub async fn get_models(
     api_key: Option<&str>,
     extra_headers: &CustomHeaders,
 ) -> Result<Vec<ModelEntry>> {
-    let uri = format!("{api_url}/v1/models");
-    let request = HttpRequest::builder()
-        .method(Method::GET)
-        .uri(uri)
-        .header("Accept", "application/json")
-        .when_some(api_key, |builder, api_key| {
-            builder.header("Authorization", format!("Bearer {api_key}"))
-        })
-        .extra_headers(extra_headers)
-        .body(AsyncBody::default())?;
-
-    let mut response = client.send(request).await?;
-
-    let mut body = String::new();
-    response.body_mut().read_to_string(&mut body).await?;
-
-    anyhow::ensure!(
-        response.status().is_success(),
-        "Failed to connect to llama.cpp API: {} {}",
-        response.status(),
-        body,
-    );
+    let body = get_json(
+        client,
+        &format!("{api_url}/v1/models"),
+        api_key,
+        extra_headers,
+        &SPEC,
+    )
+    .await?;
     let response: ListModelsResponse =
         serde_json::from_str(&body).context("Unable to parse llama.cpp models response")?;
     Ok(response.data)
@@ -835,7 +608,7 @@ mod tests {
             ]
         });
         let event: ResponseStreamEvent = serde_json::from_value(event).unwrap();
-        let delta = event.choices[0].delta.as_ref().unwrap();
+        let delta = &event.choices[0].delta;
         assert_eq!(delta.reasoning_content.as_deref(), Some("thinking..."));
         assert_eq!(delta.tool_calls.as_ref().unwrap().len(), 1);
     }

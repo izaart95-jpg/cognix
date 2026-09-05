@@ -4530,6 +4530,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f27ae1dd37df86211c42e150270f82743308803d90a6f6e6651cd730d5e1732f"
 
 [[package]]
+name = "custom_providers"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "futures 0.3.32",
+ "http_client",
+ "log",
+ "openai_protocol",
+ "schemars 1.0.4",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "cxx"
 version = "1.0.187"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9426,6 +9440,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 
 [[package]]
+name = "kilo"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "futures 0.3.32",
+ "http_client",
+ "openai_protocol",
+ "schemars 1.0.4",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "kqueue"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9660,6 +9687,7 @@ dependencies = [
  "copilot_chat",
  "copilot_ui",
  "credentials_provider",
+ "custom_providers",
  "db",
  "deepseek",
  "extension",
@@ -9671,6 +9699,7 @@ dependencies = [
  "gpui",
  "gpui_tokio",
  "http_client",
+ "kilo",
  "language",
  "language_model",
  "language_models_cloud",
@@ -9682,9 +9711,12 @@ dependencies = [
  "ollama",
  "open_ai",
  "open_router",
+ "openai_protocol",
  "openai_subscribed",
  "opencode",
  "parking_lot",
+ "paths",
+ "pretty_assertions",
  "rand 0.9.4",
  "release_channel",
  "schemars 1.0.4",
@@ -9698,6 +9730,7 @@ dependencies = [
  "ui_input",
  "util",
  "x_ai",
+ "zen",
 ]
 
 [[package]]
@@ -10206,6 +10239,7 @@ dependencies = [
  "futures 0.3.32",
  "http_client",
  "language_model_core",
+ "openai_protocol",
  "schemars 1.0.4",
  "serde",
  "serde_json",
@@ -12245,6 +12279,18 @@ dependencies = [
  "serde_json",
  "settings",
  "thiserror 2.0.17",
+]
+
+[[package]]
+name = "openai_protocol"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "futures 0.3.32",
+ "http_client",
+ "schemars 1.0.4",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -23087,6 +23133,20 @@ name = "zed_test_extension"
 version = "0.1.0"
 dependencies = [
  "zed_extension_api 0.8.0",
+]
+
+[[package]]
+name = "zen"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "futures 0.3.32",
+ "http_client",
+ "openai_protocol",
+ "rand 0.9.4",
+ "schemars 1.0.4",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

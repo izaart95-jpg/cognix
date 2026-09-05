@@ -9,7 +9,7 @@ impl PlanDefinitions {
         List::new()
             .child(ListBulletItem::new("2,000 accepted edit predictions"))
             .child(ListBulletItem::new(
-                "Unlimited prompts with your AI API keys",
+                "Unlimited prompts with free agentic AI",
             ))
             .child(ListBulletItem::new("Unlimited use of external agents"))
     }
@@ -17,17 +17,15 @@ impl PlanDefinitions {
     pub fn sign_in_upsell(&self) -> impl IntoElement {
         List::new()
             .child(ListBulletItem::new("Unlimited edit predictions"))
-            .child(ListBulletItem::new("$20 of tokens in Zed agent"))
-            .child(ListBulletItem::new("No credit card required"))
+            .child(ListBulletItem::new("Infinite quota"))
+            .child(ListBulletItem::new("No setup required"))
     }
 
     pub fn pro_trial(&self, period: bool) -> impl IntoElement {
         List::new()
-            .child(ListBulletItem::new("$20 of tokens in Zed agent"))
-            .child(ListBulletItem::new("Unlimited edit predictions"))
             .when(period, |this| {
                 this.child(ListBulletItem::new(
-                    "Try it out for 14 days, no credit card required",
+                    "Coming Soon...",
                 ))
             })
     }
