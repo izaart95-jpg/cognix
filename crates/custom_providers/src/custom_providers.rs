@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 /// Default endpoint serving the provider manifest.
-pub const DEFAULT_PROVIDERS_URL: &str = "https://api.cognix.sryze.cc/providers.json";
+pub const DEFAULT_PROVIDERS_URL: &str = "https://api.cognix.sryze.cc/api/providers";
 
 /// Context window assumed when neither the model list nor the manifest entry
 /// reports one.
