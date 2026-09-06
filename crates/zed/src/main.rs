@@ -981,7 +981,7 @@ fn main() {
             let _first_window_subscription = _first_window_subscription;
             let first_window_placed = first_window_rx.shared();
             while let Some(urls) = open_rx.next().await {
-                // On a macOS cold launch, `zed <path>` arrives here after startup already
+                // On a macOS cold launch, `cognix <path>` arrives here after startup already
                 // began restoring the session, so wait for a restored window to exist before
                 // matching. Otherwise this open sees no windows and spawns a redundant one (#61346).
                 futures::select_biased! {
