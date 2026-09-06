@@ -250,7 +250,7 @@ fn render_telemetry_section(tab_index: &mut isize, cx: &App) -> impl IntoElement
             SwitchField::new(
                 "onboarding-telemetry-metrics",
                 None::<&str>,
-                Some("Help improve Zed by sending anonymous usage data".into()),
+                Some("Help improve Cognix by sending anonymous usage data".into()),
                 if TelemetrySettings::get_global(cx).metrics {
                     ui::ToggleState::Selected
                 } else {
@@ -290,7 +290,7 @@ fn render_telemetry_section(tab_index: &mut isize, cx: &App) -> impl IntoElement
                 "onboarding-telemetry-crash-reports",
                 None::<&str>,
                 Some(
-                    "Help fix Zed by sending crash reports so we can fix critical issues fast"
+                    "Help fix Cognix by sending crash reports so we can fix critical issues fast"
                         .into(),
                 ),
                 if TelemetrySettings::get_global(cx).diagnostics {
@@ -439,12 +439,12 @@ fn render_worktree_auto_trust_switch(tab_index: &mut isize, cx: &mut App) -> imp
         ui::ToggleState::Unselected
     };
 
-    let tooltip_description = "Zed can only allow services like language servers, project settings, and MCP servers to run after you mark a new project as trusted.";
+    let tooltip_description = "Cognix can only allow services like language servers, project settings, and MCP servers to run after you mark a new project as trusted.";
 
     SwitchField::new(
         "onboarding-auto-trust-worktrees",
         Some("Trust All Projects By Default"),
-        Some("Automatically mark all new projects as trusted to unlock all Zed's features".into()),
+        Some("Automatically mark all new projects as trusted to unlock all Cognix's features".into()),
         toggle_state,
         {
             let fs = <dyn Fs>::global(cx);
