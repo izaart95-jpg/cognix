@@ -4,15 +4,6 @@
 // custom settings, run `cognix: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  "language_models": {
-   "cognix.glm": {
-      "api_url": "https://glm.cognix.sryze.cc"
-   },
-   "nim": {
-      "api_url": "https://integrate.api.nvidia.com",
-       "nim_filter_url": "https://raw.githubusercontent.com/izaart95-jpg/cognix/refs/heads/main/nvidia_model_filter"
-    }
-  },
   "title_bar": {
     "show_sign_in": false
   },
