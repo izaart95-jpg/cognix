@@ -1993,7 +1993,7 @@ async fn join_project(
             .map(|c| c.zed_version.to_string());
         drop(pool);
         Err(anyhow!(
-            "The host (v{}) and guest (v{}) are using incompatible versions of Zed. The peer with the older version must update to collaborate.",
+            "The host (v{}) and guest (v{}) are using incompatible versions of Cognix. The peer with the older version must update to collaborate.",
             host_version.as_deref().unwrap_or("unknown"),
             guest_version.as_deref().unwrap_or("unknown"),
         ))?;

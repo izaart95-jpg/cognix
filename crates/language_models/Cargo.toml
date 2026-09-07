@@ -47,6 +47,9 @@ language.workspace = true
 language_model.workspace = true
 language_models_cloud.workspace = true
 llama_cpp = { workspace = true, features = ["schemars"] }
+kilo = { workspace = true, features = ["schemars"] }
+custom_providers = { workspace = true, features = ["schemars"] }
+zen = { workspace = true, features = ["schemars"] }
 lmstudio = { workspace = true, features = ["schemars"] }
 log.workspace = true
 menu.workspace = true
@@ -56,6 +59,8 @@ open_ai = { workspace = true, features = ["schemars"] }
 openai_subscribed.workspace = true
 opencode = { workspace = true, features = ["schemars"] }
 open_router = { workspace = true, features = ["schemars"] }
+openai_protocol = { workspace = true, features = ["schemars"] }
+paths.workspace = true
 rand.workspace = true
 release_channel.workspace = true
 schemars.workspace = true
@@ -80,7 +85,5 @@ gpui = { workspace = true, features = ["test-support"] }
 http_client = { workspace = true, features = ["test-support"] }
 language_model = { workspace = true, features = ["test-support"] }
 parking_lot.workspace = true
+pretty_assertions.workspace = true
 settings = { workspace = true, features = ["test-support"] }
-
-[package.metadata.cargo-shear]
-ignored = ["component"]

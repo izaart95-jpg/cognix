@@ -20,6 +20,7 @@ pub enum VectorName {
     ProUserStamp,
     StudentStamp,
     ZedLogo,
+    CognixLogo,
     ZedXCopilot,
 }
 

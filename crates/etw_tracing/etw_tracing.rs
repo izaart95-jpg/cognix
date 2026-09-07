@@ -14,7 +14,7 @@ use workspace::notifications::{NotificationId, show_app_notification};
 use wprcontrol::*;
 
 actions!(
-    zed,
+    cognix,
     [
         /// Starts recording an ETW (Event Tracing for Windows) trace.
         RecordEtwTrace,

@@ -304,7 +304,7 @@ pub struct ExtensionIndexLanguageEntry {
 }
 
 actions!(
-    zed,
+    cognix,
     [
         /// Reloads all installed extensions.
         ReloadExtensions

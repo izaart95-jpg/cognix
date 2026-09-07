@@ -561,7 +561,7 @@ async fn test_extension_store(cx: &mut TestAppContext) {
                 "Monokai Light",
                 "Monokai Pro Dark",
                 "Monokai Pro Light",
-                "One Dark",
+                "Catppuccin Mocha",
             ]
         );
     });
@@ -657,7 +657,7 @@ async fn test_extension_store(cx: &mut TestAppContext) {
                 "Monokai Light",
                 "Monokai Pro Dark",
                 "Monokai Pro Light",
-                "One Dark",
+                "Catppuccin Mocha",
             ]
         );
     });
@@ -722,7 +722,7 @@ async fn test_extension_store(cx: &mut TestAppContext) {
                 "Monokai Light",
                 "Monokai Pro Dark",
                 "Monokai Pro Light",
-                "One Dark",
+                "Catppuccin Mocha",
             ]
         );
 

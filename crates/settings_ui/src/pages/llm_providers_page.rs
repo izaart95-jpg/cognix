@@ -27,7 +27,15 @@ pub(crate) fn render_llm_providers_page(
     window: &mut Window,
     cx: &mut Context<SettingsWindow>,
 ) -> AnyElement {
-    let providers = LanguageModelRegistry::read_global(cx).visible_providers();
+    // The remaining static cognix providers stay hidden here; dynamic
+    // custom providers (any other `cognix.*` id, registered from the
+    // server manifest) are shown so their API keys can be managed.
+    let hidden_provider_id = ["cognix.kilo", "cognix.zen"];
+    let providers = LanguageModelRegistry::read_global(cx)
+        .visible_providers()
+        .into_iter()
+        .filter(|provider| !hidden_provider_id.contains(&provider.id().0.as_ref()))
+        .collect::<Vec<_>>();
 
     v_flex()
         .id("llm-providers-page")
