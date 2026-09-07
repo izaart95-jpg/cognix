@@ -7,7 +7,7 @@ use workspace::Workspace;
 use zed_actions::feedback::{EmailZed, FileBugReport, RequestFeature};
 
 actions!(
-    zed,
+    cognix,
     [
         /// Opens the Zed repository on GitHub.
         OpenZedRepo,
