@@ -10398,7 +10398,7 @@ pub struct OpenChannelNotesById {
 }
 
 actions!(
-    zed,
+    cognix,
     [
         /// Opens the Zed log file.
         OpenLog,
