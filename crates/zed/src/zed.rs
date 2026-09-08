@@ -118,7 +118,7 @@ pub struct CrashHandler(pub Arc<crashes::Client>);
 impl gpui::Global for CrashHandler {}
 
 actions!(
-    zed,
+    cognix,
     [
         /// Opens the element inspector for debugging UI.
         DebugElements,
