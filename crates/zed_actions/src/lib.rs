@@ -36,7 +36,7 @@ pub struct ChangeKeybinding {
 }
 
 actions!(
-    zed,
+    cognix,
     [
         /// Opens the settings editor.
         #[action(deprecated_aliases = ["zed_actions::OpenSettingsEditor"])]
