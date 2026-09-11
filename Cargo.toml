@@ -203,6 +203,7 @@ members = [
     "crates/sqlez_macros",
     "crates/streaming_diff",
     "crates/sum_tree",
+    "crates/supermaven",
     "crates/svg_preview",
     "crates/syntax_theme",
     "crates/system_specs",
@@ -473,6 +474,7 @@ sqlez = { path = "crates/sqlez" }
 sqlez_macros = { path = "crates/sqlez_macros" }
 streaming_diff = { path = "crates/streaming_diff" }
 sum_tree = { path = "crates/sum_tree" }
+supermaven = { path = "crates/supermaven" }
 svg_preview = { path = "crates/svg_preview" }
 syntax_theme = { path = "crates/syntax_theme" }
 system_specs = { path = "crates/system_specs" }
@@ -1101,7 +1103,7 @@ lto = "thin"
 codegen-units = 1
 
 [profile.release.package]
-zed = { codegen-units = 16 }
+cognix = { codegen-units = 16 }
 
 [profile.release-fast]
 inherits = "release"

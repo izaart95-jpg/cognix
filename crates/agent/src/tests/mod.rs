@@ -7403,7 +7403,7 @@ async fn test_edit_file_tool_allow_still_prompts_for_local_settings(cx: &mut Tes
     fs.insert_tree(
         "/root",
         json!({
-            ".zed": {
+            ".cognix": {
                 "settings.json": "{}"
             },
             "README.md": "# Hello"
@@ -7448,7 +7448,7 @@ async fn test_edit_file_tool_allow_still_prompts_for_local_settings(cx: &mut Tes
     let _task = cx.update(|cx| {
         tool.run(
             ToolInput::resolved(crate::EditFileToolInput {
-                path: "root/.zed/settings.json".into(),
+                path: "root/.cognix/settings.json".into(),
                 edits: vec![],
             }),
             event_stream,

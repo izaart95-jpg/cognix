@@ -1,12 +1,12 @@
 [package]
 description = "The fast, collaborative code editor."
 edition.workspace = true
-name = "zed"
+name = "cognix"
 version = "1.20.0"
 publish.workspace = true
 license = "GPL-3.0-or-later"
 authors = ["Zed Team <hi@zed.dev>"]
-default-run = "zed"
+default-run = "cognix"
 
 [lints]
 workspace = true
@@ -59,7 +59,7 @@ visual-tests = [
 ]
 
 [[bin]]
-name = "zed"
+name = "cognix"
 path = "src/main.rs"
 
 [[bin]]
@@ -203,6 +203,7 @@ sidebar.workspace = true
 smol.workspace = true
 snippet_provider.workspace = true
 snippets_ui.workspace = true
+supermaven.workspace = true
 svg_preview.workspace = true
 sysinfo.workspace = true
 tab_switcher.workspace = true
@@ -288,7 +289,7 @@ identifier = "dev.zed.Zed-Dev"
 name = "Zed Dev"
 osx_minimum_system_version = "10.15.7"
 osx_info_plist_exts = ["resources/info/*"]
-osx_url_schemes = ["zed"]
+osx_url_schemes = ["zed", "cognix"]
 
 [package.metadata.bundle-nightly]
 icon = ["resources/app-icon-nightly@2x.png", "resources/app-icon-nightly.png"]
@@ -296,7 +297,7 @@ identifier = "dev.zed.Zed-Nightly"
 name = "Zed Nightly"
 osx_minimum_system_version = "10.15.7"
 osx_info_plist_exts = ["resources/info/*"]
-osx_url_schemes = ["zed"]
+osx_url_schemes = ["zed", "cognix"]
 
 [package.metadata.bundle-preview]
 icon = ["resources/app-icon-preview@2x.png", "resources/app-icon-preview.png"]
@@ -304,7 +305,7 @@ identifier = "dev.zed.Zed-Preview"
 name = "Zed Preview"
 osx_minimum_system_version = "10.15.7"
 osx_info_plist_exts = ["resources/info/*"]
-osx_url_schemes = ["zed"]
+osx_url_schemes = ["zed", "cognix"]
 
 [package.metadata.bundle-stable]
 icon = ["resources/app-icon@2x.png", "resources/app-icon.png"]
@@ -312,7 +313,7 @@ identifier = "dev.zed.Zed"
 name = "Zed"
 osx_minimum_system_version = "10.15.7"
 osx_info_plist_exts = ["resources/info/*"]
-osx_url_schemes = ["zed"]
+osx_url_schemes = ["zed", "cognix"]
 
 [package.metadata.cargo-shear]
 ignored = ["profiling", "tracing"]

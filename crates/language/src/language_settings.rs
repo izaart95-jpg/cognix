@@ -540,6 +540,7 @@ impl EditPredictionSettings {
                 .map_or_else(DelayMs::default, |settings| settings.prediction_debounce),
             settings::EditPredictionProvider::Zed => self.zed.prediction_debounce,
             settings::EditPredictionProvider::Mercury => self.mercury.prediction_debounce,
+            settings::EditPredictionProvider::Supermaven => DelayMs::default(),
             settings::EditPredictionProvider::None => DelayMs::default(),
         };
         Duration::from_millis(delay.0)
@@ -554,6 +555,7 @@ impl EditPredictionSettings {
         match delegate_name {
             "copilot" => Duration::from_millis(self.copilot.prediction_debounce.0),
             "codestral" => Duration::from_millis(self.codestral.prediction_debounce.0),
+            "supermaven" => Duration::ZERO,
             "zed-predict" => self.debounce_for(self.provider),
             _ => Duration::ZERO,
         }

@@ -8,6 +8,7 @@ use gpui::{AnyWindowHandle, App, AppContext as _, Context, Entity, WeakEntity};
 use language::language_settings::{
     EditPredictionPromptFormat, EditPredictionProvider, all_language_settings,
 };
+use supermaven::SupermavenEditPredictionDelegate;
 
 use settings::SettingsStore;
 use std::{cell::RefCell, rc::Rc, sync::Arc};
@@ -114,6 +115,7 @@ fn edit_prediction_provider_config_for_settings(cx: &App) -> Option<EditPredicti
     match provider {
         EditPredictionProvider::None => None,
         EditPredictionProvider::Copilot => Some(EditPredictionProviderConfig::Copilot),
+        EditPredictionProvider::Supermaven => Some(EditPredictionProviderConfig::Supermaven),
         EditPredictionProvider::Zed => {
             Some(EditPredictionProviderConfig::Zed(EditPredictionModel::Zeta))
         }
@@ -158,6 +160,7 @@ fn edit_prediction_provider_config_for_settings(cx: &App) -> Option<EditPredicti
 enum EditPredictionProviderConfig {
     Copilot,
     Codestral,
+    Supermaven,
     Zed(EditPredictionModel),
 }
 
@@ -166,6 +169,7 @@ impl EditPredictionProviderConfig {
         match self {
             EditPredictionProviderConfig::Copilot => "Copilot",
             EditPredictionProviderConfig::Codestral => "Codestral",
+            EditPredictionProviderConfig::Supermaven => "Supermaven",
             EditPredictionProviderConfig::Zed(model) => match model {
                 EditPredictionModel::Zeta => "Zeta",
                 EditPredictionModel::Fim { .. } => "FIM",
@@ -249,6 +253,11 @@ fn assign_edit_prediction_provider(
         Some(EditPredictionProviderConfig::Codestral) => {
             let http_client = client.http_client();
             let provider = cx.new(|_| CodestralEditPredictionDelegate::new(http_client));
+            editor.set_edit_prediction_provider(Some(provider), trigger, window, cx);
+        }
+        Some(EditPredictionProviderConfig::Supermaven) => {
+            let http_client = client.http_client();
+            let provider = cx.new(|_| SupermavenEditPredictionDelegate::new(http_client));
             editor.set_edit_prediction_provider(Some(provider), trigger, window, cx);
         }
         Some(EditPredictionProviderConfig::Zed(model)) => {

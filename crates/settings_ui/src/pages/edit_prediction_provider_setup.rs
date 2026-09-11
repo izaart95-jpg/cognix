@@ -31,6 +31,7 @@ pub(crate) fn render_edit_prediction_setup_page(
 ) -> AnyElement {
     let providers = [
         Some(render_provider_dropdown(window, cx)),
+        Some(render_supermaven_provider(settings_window, window, cx).into_any_element()),
         Some(render_zed_provider(settings_window, window, cx).into_any_element()),
         render_github_copilot_provider(settings_window, window, cx)
             .map(IntoElement::into_any_element),
@@ -907,6 +908,42 @@ fn zed_settings() -> Box<[SettingsPageItem]> {
         metadata: None,
         files: USER,
     })])
+}
+
+fn render_supermaven_provider(
+    _settings_window: &SettingsWindow,
+    _window: &mut Window,
+    _cx: &mut Context<SettingsWindow>,
+) -> impl IntoElement {
+    v_flex()
+        .id("supermaven")
+        .min_w_0()
+        .pt_8()
+        .gap_1p5()
+        .child(
+            SettingsSectionHeader::new("Supermaven")
+                .icon(IconName::Cognix)
+                .no_padding(true),
+        )
+        .child(
+            v_flex()
+                .min_w_0()
+                .gap_1p5()
+                .pt_2p5()
+                .child(
+                    Label::new("Free code completions from Supermaven, no account required.")
+                        .size(LabelSize::Small)
+                        .color(Color::Muted),
+                )
+                .child(
+                    Label::new(
+                        "The first completion downloads the Supermaven agent binary; \
+                         every open file is sent to Supermaven's servers.",
+                    )
+                    .size(LabelSize::Small)
+                    .color(Color::Muted),
+                ),
+        )
 }
 
 fn render_zed_provider(

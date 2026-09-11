@@ -759,7 +759,7 @@ mod tests {
         fs.insert_tree(
             path!("/dir"),
             json!({
-                ".zed": {
+                ".cognix": {
                     "tasks.json": r#"[
                         {
                             "label": "example task",
@@ -932,7 +932,7 @@ mod tests {
         fs.insert_tree(
             path!("/dir"),
             json!({
-                ".zed": {
+                ".cognix": {
                     "tasks.json": r#"[
                         {
                             "label": "hello from $ZED_FILE:$ZED_ROW:$ZED_COLUMN",
