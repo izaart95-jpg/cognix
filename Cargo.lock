@@ -17753,6 +17753,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "smol",
+ "tempfile",
  "util",
 ]
 

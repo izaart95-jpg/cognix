@@ -103,8 +103,8 @@ pub async fn ensure_binary(http_client: &dyn HttpClient) -> Result<PathBuf> {
             .map(|duration| duration.as_nanos())
             .unwrap_or(0)
     ));
-    let result = download_verify_and_install(http_client, &download_path, &temp_file, &destination)
-        .await;
+    let result =
+        download_verify_and_install(http_client, &download_path, &temp_file, &destination).await;
     if result.is_err() {
         // Best-effort cleanup of a partial download.
         let _ = std::fs::remove_file(&temp_file);
@@ -275,12 +275,11 @@ mod tests {
     fn test_outbound_message_serialization() {
         use crate::protocol::{OutboundMessage, StateUpdate, StateUpdateEntry};
 
-        let greeting =
-            serde_json::to_string(&OutboundMessage::Greeting { allow_gitignore: false }).unwrap();
-        assert_eq!(
-            greeting,
-            r#"{"kind":"greeting","allowGitignore":false}"#
-        );
+        let greeting = serde_json::to_string(&OutboundMessage::Greeting {
+            allow_gitignore: false,
+        })
+        .unwrap();
+        assert_eq!(greeting, r#"{"kind":"greeting","allowGitignore":false}"#);
 
         let free = serde_json::to_string(&OutboundMessage::UseFreeVersion).unwrap();
         assert_eq!(free, r#"{"kind":"use_free_version"}"#);

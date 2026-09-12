@@ -36,9 +36,9 @@ struct CurrentSuggestion {
 
 pub struct SupermavenEditPredictionDelegate {
     http_client: Arc<dyn HttpClient>,
+    /// The shared agent session. `None` until the first refresh, so closing
+    /// and reopening the last file kills and respawns the agent as expected.
     agent: Option<SmAgent>,
-    /// How many times a dead agent has been restarted, for diagnostics.
-    agent_restart_count: usize,
     current_suggestion: Option<CurrentSuggestion>,
     pending_refresh: Option<Task<Result<()>>>,
 }
@@ -48,29 +48,23 @@ impl SupermavenEditPredictionDelegate {
         Self {
             http_client,
             agent: None,
-            agent_restart_count: 0,
             current_suggestion: None,
             pending_refresh: None,
         }
     }
 
-    /// Returns a task that resolves to a running agent, starting one if this
-    /// is the first call or restarting one that died (the agent owns its own
-    /// credential file, so a restart needs no re-activation).
+    /// Returns a task that resolves to the running agent, starting the
+    /// shared session on the first call or restarting it after the last
+    /// session died (the agent owns its credential file, so a restart needs
+    /// no re-activation).
     fn agent(&mut self, cx: &mut Context<Self>) -> Task<Result<SmAgent>> {
-        if let Some(agent) = self.agent.clone() {
-            if agent.is_running() {
-                return Task::ready(Ok(agent));
-            }
-            log::info!("Supermaven agent exited; restarting it");
-            self.agent = None;
-            self.agent_restart_count += 1;
+        if let Some(agent) = self.agent.clone()
+            && agent.is_running()
+        {
+            return Task::ready(Ok(agent));
         }
         let http_client = self.http_client.clone();
-        cx.background_spawn(async move {
-            let binary_path = binary_fetcher::ensure_binary(http_client.as_ref()).await?;
-            SmAgent::start(&binary_path).await
-        })
+        cx.background_spawn(async move { SmAgent::shared(http_client.as_ref()).await })
     }
 
     fn refresh(
@@ -88,24 +82,23 @@ impl SupermavenEditPredictionDelegate {
 
             let agent = agent_task.await?;
 
-            // Cache the running agent so future refreshes skip the download
-            // and spawn.
+            // Cache the running agent so future refreshes reuse the shared
+            // session without another start attempt.
             this.update(cx, |this, _| {
                 this.agent.get_or_insert_with(|| agent.clone());
             })?;
 
-            let (path, full_text, prefix, cursor_offset) = buffer
-                .read_with(cx, |buffer, cx| {
-                    let snapshot = buffer.snapshot();
-                    let full_text = snapshot.text();
-                    let cursor_offset = cursor_position.to_offset(&snapshot);
-                    let prefix: String = snapshot.text_for_range(0..cursor_offset).collect();
-                    let path = buffer
-                        .file()
-                        .and_then(|file| file.as_local())
-                        .map(|local_file| local_file.abs_path(cx));
-                    (path, full_text, prefix, cursor_offset)
-                });
+            let (path, full_text, prefix, cursor_offset) = buffer.read_with(cx, |buffer, cx| {
+                let snapshot = buffer.snapshot();
+                let full_text = snapshot.text();
+                let cursor_offset = cursor_position.to_offset(&snapshot);
+                let prefix: String = snapshot.text_for_range(0..cursor_offset).collect();
+                let path = buffer
+                    .file()
+                    .and_then(|file| file.as_local())
+                    .map(|local_file| local_file.abs_path(cx));
+                (path, full_text, prefix, cursor_offset)
+            });
 
             let Some(path) = path else {
                 anyhow::bail!("Supermaven only supports local files");
@@ -119,9 +112,7 @@ impl SupermavenEditPredictionDelegate {
                 );
             }
 
-            agent
-                .submit_state(&path, &prefix, &full_text, cursor_offset)
-                .await?;
+            agent.submit_state(&path, &prefix, &full_text, cursor_offset)?;
 
             // Poll while the model streams, so ghost text grows as chunks
             // arrive. Stop when the window lapses or every state has ended.
@@ -130,16 +121,15 @@ impl SupermavenEditPredictionDelegate {
                 // Always render at least once: a deduped submission reuses
                 // an already-complete state whose items still hold a
                 // completion worth showing.
-                let derived = agent.derive_completion(&prefix);
-                let suggestion =
-                    build_suggestion(&buffer, &cursor_position, derived, cx).await;
+                let derived = agent.derive_completion(&path, &prefix);
+                let suggestion = build_suggestion(&buffer, &cursor_position, derived, cx).await;
 
                 this.update(cx, |this, cx| {
                     this.current_suggestion = suggestion;
                     cx.notify();
                 })?;
 
-                if !agent.is_streaming() || Instant::now() > poll_deadline {
+                if !agent.is_streaming(&path) || Instant::now() > poll_deadline {
                     break;
                 }
                 cx.background_executor().timer(POLL_INTERVAL).await;
@@ -170,8 +160,9 @@ async fn build_suggestion(
         // characters in that range should be whitespace; otherwise the
         // buffer no longer matches what the model predicted.
         if derived.prior_delete > 0 {
-            let deletion_range_text: String =
-                snapshot.text_for_range(range_start..cursor_offset).collect();
+            let deletion_range_text: String = snapshot
+                .text_for_range(range_start..cursor_offset)
+                .collect();
             if !deletion_range_text.chars().all(char::is_whitespace) {
                 return None;
             }

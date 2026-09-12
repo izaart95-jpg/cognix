@@ -80,8 +80,12 @@ pub enum InboundMessage {
         #[serde(default, rename = "statusText")]
         status_text: Option<String>,
     },
-    UserStatus { tier: String },
-    ServiceTier { display: String },
+    UserStatus {
+        tier: String,
+    },
+    ServiceTier {
+        display: String,
+    },
     /// Settings pushed by the agent. We only care about the `disabled` key.
     Set {
         #[serde(default)]
