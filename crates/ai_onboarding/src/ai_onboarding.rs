@@ -297,7 +297,7 @@ impl ZedAiOnboarding {
             .child(Self::pro_trial_stamp(cx))
             .child(Headline::new("Welcome to the Zed Pro Trial"))
             .child(
-                Label::new("Here's what you get for the next 14 days:")
+                Label::new("Included for 14 days from when your trial started:")
                     .color(Color::Muted)
                     .mb_2(),
             )
