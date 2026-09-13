@@ -6851,7 +6851,7 @@ impl ThreadView {
                 (self.is_subagent() && self.is_thread_feedback_enabled(cx)).then(|| {
                     let feedback = self.thread_feedback.feedback;
                     let tooltip_meta =
-                        "Rating the thread sends all of your current conversation to the Zed team.";
+                        "Rating the thread sends all of your current conversation to the Cognix team.";
 
                     h_flex()
                         .child(

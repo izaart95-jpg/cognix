@@ -91,9 +91,10 @@ impl merge_from::MergeFrom for AllLanguageSettingsContent {
 #[serde(rename_all = "snake_case")]
 pub enum EditPredictionProvider {
     None,
-    #[default]
     Copilot,
     Zed,
+    #[default]
+    Supermaven,
     Codestral,
     Ollama,
     OpenAiCompatibleApi,
@@ -106,6 +107,7 @@ impl EditPredictionProvider {
             EditPredictionProvider::Zed => true,
             EditPredictionProvider::None
             | EditPredictionProvider::Copilot
+            | EditPredictionProvider::Supermaven
             | EditPredictionProvider::Codestral
             | EditPredictionProvider::Ollama
             | EditPredictionProvider::OpenAiCompatibleApi
@@ -117,6 +119,7 @@ impl EditPredictionProvider {
         match self {
             EditPredictionProvider::Zed => Some("Zed AI"),
             EditPredictionProvider::Copilot => Some("GitHub Copilot"),
+            EditPredictionProvider::Supermaven => Some("Supermaven"),
             EditPredictionProvider::Codestral => Some("Codestral"),
             EditPredictionProvider::Mercury => Some("Mercury"),
             EditPredictionProvider::None => None,

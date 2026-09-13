@@ -1,0 +1,26 @@
+[package]
+name = "zen"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/zen.rs"
+
+[features]
+default = []
+schemars = ["dep:schemars", "openai_protocol/schemars"]
+
+[dependencies]
+anyhow.workspace = true
+futures.workspace = true
+http_client.workspace = true
+openai_protocol.workspace = true
+rand.workspace = true
+schemars = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true

@@ -17,6 +17,14 @@ pub struct AllLanguageModelSettingsContent {
     pub google: Option<GoogleSettingsContent>,
     #[serde(rename = "llama.cpp")]
     pub llama_cpp: Option<LlamaCppSettingsContent>,
+    #[serde(rename = "zen")]
+    pub zen: Option<ZenSettingsContent>,
+    #[serde(rename = "cognix.kilo")]
+    pub kilo: Option<KiloSettingsContent>,
+    /// Server-sided custom providers: a manifest (`providers.json`) fetched
+    /// from a URL describes every provider, so adding one needs no app
+    /// update.
+    pub custom_providers: Option<CustomProvidersSettingsContent>,
     pub lmstudio: Option<LmStudioSettingsContent>,
     pub mistral: Option<MistralSettingsContent>,
     pub ollama: Option<OllamaSettingsContent>,
@@ -275,7 +283,7 @@ pub struct OpenCodeAvailableModel {
     pub max_output_tokens: Option<u64>,
     /// The API protocol to use for this model: "anthropic", "openai_responses", "openai_chat", or "google". Defaults to "openai_chat".
     pub protocol: Option<OpenCodeApiProtocol>,
-    /// The subscription for this model: "zen" or "go". Defaults to Zen.
+    /// The subscription for this model: "zen", "go", or "free". Defaults to Zen.
     pub subscription: Option<OpenCodeModelSubscription>,
     /// Custom Model API URL to use for this model.
     pub custom_model_api_url: Option<String>,
@@ -333,6 +341,36 @@ pub struct LlamaCppAvailableModel {
     pub supports_images: Option<bool>,
     /// Whether the model emits reasoning/thinking content.
     pub supports_thinking: Option<bool>,
+}
+
+#[with_fallible_options]
+#[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
+pub struct CustomProvidersSettingsContent {
+    /// URL of the provider manifest (`providers.json`). When empty, the
+    /// built-in default is used.
+    pub url: Option<String>,
+    /// How often (in minutes) the manifest is re-fetched so server-side
+    /// changes (new providers, `active` toggles, changed model lists) take
+    /// effect without restarting. `0` disables periodic refresh; the
+    /// manifest is then only fetched at startup and when the URL changes.
+    /// Defaults to 10.
+    pub refresh_interval_minutes: Option<u64>,
+}
+
+#[with_fallible_options]
+#[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
+pub struct ZenSettingsContent {
+    pub api_url: Option<String>,
+    pub available_models: Option<Vec<LlamaCppAvailableModel>>,
+    pub custom_headers: Option<HashMap<String, String>>,
+}
+
+#[with_fallible_options]
+#[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
+pub struct KiloSettingsContent {
+    pub api_url: Option<String>,
+    pub available_models: Option<Vec<LlamaCppAvailableModel>>,
+    pub custom_headers: Option<HashMap<String, String>>,
 }
 
 #[with_fallible_options]

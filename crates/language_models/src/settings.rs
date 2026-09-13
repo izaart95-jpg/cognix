@@ -5,12 +5,13 @@ use settings::RegisterSetting;
 
 use crate::provider::{
     anthropic, anthropic::AnthropicSettings, anthropic_compatible::AnthropicCompatibleSettings,
-    bedrock, bedrock::AmazonBedrockSettings, cloud::ZedDotDevSettings, deepseek::DeepSeekSettings,
-    google::GoogleSettings, llama_cpp::LlamaCppSettings, lmstudio::LmStudioSettings, mistral,
-    mistral::MistralSettings, ollama::OllamaSettings, open_ai::OpenAiSettings,
-    open_ai_compatible::OpenAiCompatibleSettings, open_router, open_router::OpenRouterSettings,
-    opencode, opencode::OpenCodeSettings, resolve_custom_headers,
-    vercel_ai_gateway::VercelAiGatewaySettings, x_ai::XAiSettings,
+    bedrock, bedrock::AmazonBedrockSettings, cloud::ZedDotDevSettings, custom_providers,
+    deepseek::DeepSeekSettings, google::GoogleSettings, kilo::KiloSettings,
+    llama_cpp::LlamaCppSettings, lmstudio::LmStudioSettings, mistral, mistral::MistralSettings,
+    ollama::OllamaSettings, open_ai::OpenAiSettings, open_ai_compatible::OpenAiCompatibleSettings,
+    open_router, open_router::OpenRouterSettings, opencode, opencode::OpenCodeSettings,
+    resolve_custom_headers, vercel_ai_gateway::VercelAiGatewaySettings, x_ai::XAiSettings,
+    zen::ZenSettings,
 };
 
 #[derive(Debug, RegisterSetting)]
@@ -21,6 +22,9 @@ pub struct AllLanguageModelSettings {
     pub deepseek: DeepSeekSettings,
     pub google: GoogleSettings,
     pub llama_cpp: LlamaCppSettings,
+    pub custom_providers: custom_providers::CustomProvidersSettings,
+    pub zen: ZenSettings,
+    pub kilo: KiloSettings,
     pub lmstudio: LmStudioSettings,
     pub mistral: MistralSettings,
     pub ollama: OllamaSettings,
@@ -55,6 +59,9 @@ impl settings::Settings for AllLanguageModelSettings {
         let deepseek = language_models.deepseek.unwrap();
         let google = language_models.google.unwrap();
         let llama_cpp = language_models.llama_cpp.unwrap();
+        let custom_providers = language_models.custom_providers.unwrap_or_default();
+        let zen = language_models.zen.unwrap_or_default();
+        let kilo = language_models.kilo.unwrap_or_default();
         let lmstudio = language_models.lmstudio.unwrap();
         let mistral = language_models.mistral.unwrap();
         let ollama = language_models.ollama.unwrap();
@@ -121,11 +128,34 @@ impl settings::Settings for AllLanguageModelSettings {
                 custom_headers: custom_headers_from("Google AI", google.custom_headers, &[]),
             },
             llama_cpp: LlamaCppSettings {
-                api_url: llama_cpp.api_url.unwrap(),
+                api_url: llama_cpp.api_url.clone().unwrap(),
                 auto_discover: llama_cpp.auto_discover.unwrap_or(true),
-                available_models: llama_cpp.available_models.unwrap_or_default(),
+                available_models: llama_cpp.available_models.clone().unwrap_or_default(),
                 context_window: llama_cpp.context_window,
                 custom_headers: custom_headers_from("llama.cpp", llama_cpp.custom_headers, &[]),
+            },
+            custom_providers: custom_providers::CustomProvidersSettings {
+                url: {
+                    let url = custom_providers.url.unwrap_or_default();
+                    if url.is_empty() {
+                        custom_providers::DEFAULT_PROVIDERS_URL.to_string()
+                    } else {
+                        url
+                    }
+                },
+                refresh_interval_minutes: custom_providers
+                    .refresh_interval_minutes
+                    .unwrap_or(custom_providers::DEFAULT_REFRESH_INTERVAL_MINUTES),
+            },
+            zen: ZenSettings {
+                api_url: zen.api_url.unwrap_or_default(),
+                available_models: zen.available_models.unwrap_or_default(),
+                custom_headers: custom_headers_from("zen", zen.custom_headers, &[]),
+            },
+            kilo: KiloSettings {
+                api_url: kilo.api_url.unwrap_or_default(),
+                available_models: kilo.available_models.unwrap_or_default(),
+                custom_headers: custom_headers_from("cognix-kilo", kilo.custom_headers, &[]),
             },
             lmstudio: LmStudioSettings {
                 api_url: lmstudio.api_url.unwrap(),

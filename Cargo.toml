@@ -8,6 +8,9 @@ members = [
     "crates/agent",
     "crates/agent_servers",
     "crates/agent_settings",
+    "crates/kilo",
+    "crates/zen",
+    "crates/openai_protocol",
     "crates/agent_skills",
     "crates/agent_ui",
     "crates/ai_onboarding",
@@ -45,6 +48,7 @@ members = [
     "crates/copilot_chat",
     "crates/crashes",
     "crates/credentials_provider",
+    "crates/custom_providers",
     "crates/dap",
     "crates/dap_adapters",
     "crates/db",
@@ -200,6 +204,7 @@ members = [
     "crates/sqlez_macros",
     "crates/streaming_diff",
     "crates/sum_tree",
+    "crates/supermaven",
     "crates/svg_preview",
     "crates/syntax_theme",
     "crates/system_specs",
@@ -398,7 +403,11 @@ line_ending_selector = { path = "crates/line_ending_selector" }
 livekit_api = { path = "crates/livekit_api" }
 livekit_client = { path = "crates/livekit_client" }
 llama_cpp = { path = "crates/llama_cpp" }
+kilo = { path = "crates/kilo" }
+zen = { path = "crates/zen" }
 lmstudio = { path = "crates/lmstudio" }
+openai_protocol = { path = "crates/openai_protocol" }
+custom_providers = { path = "crates/custom_providers" }
 lsp = { path = "crates/lsp" }
 lsp_command_selector = { path = "crates/lsp_command_selector" }
 lsp_locations = { path = "crates/lsp_locations" }
@@ -467,6 +476,7 @@ sqlez = { path = "crates/sqlez" }
 sqlez_macros = { path = "crates/sqlez_macros" }
 streaming_diff = { path = "crates/streaming_diff" }
 sum_tree = { path = "crates/sum_tree" }
+supermaven = { path = "crates/supermaven" }
 svg_preview = { path = "crates/svg_preview" }
 syntax_theme = { path = "crates/syntax_theme" }
 system_specs = { path = "crates/system_specs" }
@@ -568,11 +578,13 @@ betlang = "0.1.1"
 bitflags = "2.6.0"
 block = "0.1"
 block2 = "0.6"
+brotli = "8.0.2"
 brush-parser = "0.3"
 bytes = "1.0"
 cargo_metadata = "0.19"
 cargo_toml = "0.21"
 cbindgen = { version = "0.28.0", default-features = false }
+cfg-if = "1.0.3"
 chardetng = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 ciborium = "0.2"
@@ -581,6 +593,7 @@ clap = { version = "4.4", features = ["derive", "wrap_help"] }
 clap_complete = { version = "4.4" }
 clap_complete_nushell = { version = "4.4" }
 cocoa = "=0.26.0"
+cocoa-foundation = "=0.2.0"
 console = "0.16"
 console_error_panic_hook = "0.1.7"
 const_format = "0.2"
@@ -627,6 +640,7 @@ fork = "0.4.0"
 futures = "0.3.34"
 futures-concurrency = "7.7.1"
 futures-lite = "2"
+futures-util = "0.3.32"
 gh-workflow = { git = "https://github.com/zed-industries/gh-workflow", rev = "37f3c0575d379c218a9c455ee67585184e40d43f" }
 globset = "0.4"
 handlebars = "4.3"
@@ -753,6 +767,7 @@ palette = { version = "0.7.5", default-features = false, features = ["std"] }
 parking_lot = "0.12.1"
 parse_int = "0.9"
 partial-json-fixer = "0.5.3"
+pathdiff = "0.2"
 pathfinder_geometry = "0.5"
 pciid-parser = "0.8.0"
 percent-encoding = "2.3.2"
@@ -1077,6 +1092,10 @@ journal = { codegen-units = 1 }
 json_schema_store = { codegen-units = 1 }
 llama_cpp = { codegen-units = 1 }
 lmstudio = { codegen-units = 1 }
+kilo = { codegen-units = 1 }
+zen = { codegen-units = 1 }
+openai_protocol = { codegen-units = 1 }
+custom_providers = { codegen-units = 1 }
 menu = { codegen-units = 1 }
 notifications = { codegen-units = 1 }
 ollama = { codegen-units = 1 }
@@ -1103,7 +1122,7 @@ lto = "thin"
 codegen-units = 1
 
 [profile.release.package]
-zed = { codegen-units = 16 }
+cognix = { codegen-units = 16 }
 
 [profile.release-fast]
 inherits = "release"

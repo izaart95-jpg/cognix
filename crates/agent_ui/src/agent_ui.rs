@@ -464,7 +464,7 @@ impl Agent {
 
     pub fn label(&self) -> SharedString {
         match self {
-            Self::NativeAgent => "Zed Agent".into(),
+            Self::NativeAgent => "Cognix Agent".into(),
             Self::Custom { id, .. } => id.0.clone(),
             #[cfg(any(test, feature = "test-support"))]
             Self::Stub => "Stub Agent".into(),
@@ -852,7 +852,8 @@ fn update_command_palette_filter(cx: &mut App) {
                 | EditPredictionProvider::Codestral
                 | EditPredictionProvider::Ollama
                 | EditPredictionProvider::OpenAiCompatibleApi
-                | EditPredictionProvider::Mercury => {
+                | EditPredictionProvider::Mercury
+                | EditPredictionProvider::Supermaven => {
                     filter.show_namespace("edit_prediction");
                     filter.hide_namespace("copilot");
                     filter.show_action_types(edit_prediction_actions.iter());

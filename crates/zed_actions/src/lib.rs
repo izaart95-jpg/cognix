@@ -436,7 +436,7 @@ pub mod feedback {
         feedback,
         [
             /// Opens email client to send feedback to Zed support.
-            EmailZed,
+            EmailCognix,
             /// Opens the bug report form.
             FileBugReport,
             /// Opens the feature request form.

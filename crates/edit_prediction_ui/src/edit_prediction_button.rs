@@ -261,6 +261,65 @@ impl Render for EditPredictionButton {
                         .with_handle(self.popover_menu_handle.clone()),
                 )
             }
+            EditPredictionProvider::Supermaven => {
+                let enabled = self.editor_enabled.unwrap_or(true);
+                let this = cx.weak_entity();
+                let file = self.file.clone();
+                let language = self.language.clone();
+                let project = self.project.clone();
+
+                let tooltip_meta = if enabled {
+                    "Powered by Supermaven (free tier)"
+                } else {
+                    "Edit predictions are disabled for this file"
+                };
+
+                div().child(
+                    PopoverMenu::new("supermaven")
+                        .on_open({
+                            let file = file.clone();
+                            let language = language;
+                            let project = project;
+                            Rc::new(move |_window, cx| {
+                                emit_edit_prediction_menu_opened(
+                                    "supermaven",
+                                    &file,
+                                    &language,
+                                    &project,
+                                    cx,
+                                );
+                            })
+                        })
+                        .menu(move |window, cx| {
+                            this.update(cx, |this, cx| {
+                                this.build_supermaven_context_menu(window, cx)
+                            })
+                            .ok()
+                        })
+                        .anchor(Anchor::BottomRight)
+                        .trigger_with_tooltip(
+                            IconButton::new("supermaven-icon", IconName::Cognix)
+                                .shape(IconButtonShape::Square)
+                                .tab_index(0isize)
+                                .aria_label("Edit Prediction")
+                                .when(!enabled, |this| {
+                                    this.indicator(Indicator::dot().color(Color::Ignored))
+                                        .indicator_border_color(Some(
+                                            cx.theme().colors().status_bar_background,
+                                        ))
+                                }),
+                            move |_window, cx| {
+                                Tooltip::with_meta(
+                                    "Edit Prediction",
+                                    Some(&ToggleMenu),
+                                    tooltip_meta,
+                                    cx,
+                                )
+                            },
+                        )
+                        .with_handle(self.popover_menu_handle.clone()),
+                )
+            }
             EditPredictionProvider::OpenAiCompatibleApi => {
                 let enabled = self.editor_enabled.unwrap_or(true);
                 let this = cx.weak_entity();
@@ -1104,6 +1163,24 @@ impl EditPredictionButton {
         })
     }
 
+    fn build_supermaven_context_menu(
+        &self,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) -> Entity<ContextMenu> {
+        ContextMenu::build(window, cx, |menu, window, cx| {
+            let menu = self.build_language_settings_menu(menu, window, cx);
+            let menu = self.add_provider_switching_section(
+                menu,
+                EditPredictionProvider::Supermaven,
+                cx,
+            );
+
+            let menu = self.add_configure_providers_item(menu);
+            menu
+        })
+    }
+
     fn build_edit_prediction_context_menu(
         &self,
         provider: EditPredictionProvider,
@@ -1488,6 +1565,7 @@ pub fn set_completion_provider(fs: Arc<dyn Fs>, cx: &mut App, provider: EditPred
 pub fn get_available_providers(cx: &mut App) -> Vec<EditPredictionProvider> {
     let mut providers = Vec::new();
 
+    providers.push(EditPredictionProvider::Supermaven);
     providers.push(EditPredictionProvider::Zed);
 
     let app_state = workspace::AppState::global(cx);

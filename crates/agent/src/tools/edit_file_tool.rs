@@ -1388,12 +1388,12 @@ mod tests {
         // Test 1: Path with .zed component should require confirmation
         let (stream_tx, mut stream_rx) = ToolCallEventStream::test();
         let _auth = cx
-            .update(|cx| edit_tool.authorize(&PathBuf::from(".zed/settings.json"), &stream_tx, cx));
+            .update(|cx| edit_tool.authorize(&PathBuf::from(".cognix/settings.json"), &stream_tx, cx));
 
         let event = stream_rx.expect_authorization().await;
         assert_eq!(
             event.tool_call.fields.title,
-            Some("Edit `.zed/settings.json` (local settings)".into())
+            Some("Edit `.cognix/settings.json` (local settings)".into())
         );
 
         // Test 2: Path outside project should require confirmation
@@ -1417,12 +1417,12 @@ mod tests {
         // Test 4: Path with .zed in the middle should require confirmation
         let (stream_tx, mut stream_rx) = ToolCallEventStream::test();
         let _auth = cx.update(|cx| {
-            edit_tool.authorize(&PathBuf::from("root/.zed/tasks.json"), &stream_tx, cx)
+            edit_tool.authorize(&PathBuf::from("root/.cognix/tasks.json"), &stream_tx, cx)
         });
         let event = stream_rx.expect_authorization().await;
         assert_eq!(
             event.tool_call.fields.title,
-            Some("Edit `root/.zed/tasks.json` (local settings)".into())
+            Some("Edit `root/.cognix/tasks.json` (local settings)".into())
         );
 
         // Test 5: When global default is allow, sensitive and outside-project
@@ -1433,14 +1433,14 @@ mod tests {
             agent_settings::AgentSettings::override_global(settings, cx);
         });
 
-        // 5.1: .zed/settings.json is a sensitive path — still prompts
+        // 5.1: .cognix/settings.json is a sensitive path — still prompts
         let (stream_tx, mut stream_rx) = ToolCallEventStream::test();
         let _auth = cx
-            .update(|cx| edit_tool.authorize(&PathBuf::from(".zed/settings.json"), &stream_tx, cx));
+            .update(|cx| edit_tool.authorize(&PathBuf::from(".cognix/settings.json"), &stream_tx, cx));
         let event = stream_rx.expect_authorization().await;
         assert_eq!(
             event.tool_call.fields.title,
-            Some("Edit `.zed/settings.json` (local settings)".into())
+            Some("Edit `.cognix/settings.json` (local settings)".into())
         );
 
         // 5.2: /etc/hosts is outside the project, but Allow auto-approves
@@ -1577,7 +1577,7 @@ mod tests {
         fs.insert_tree(
             path!("/root"),
             json!({
-                ".zed": { "foo": {}, "settings.json": "{}" },
+                ".cognix": { "foo": {}, "settings.json": "{}" },
             }),
         )
         .await;
@@ -1587,7 +1587,7 @@ mod tests {
         let (stream_tx, mut stream_rx) = ToolCallEventStream::test();
         let _auth = cx.update(|cx| {
             edit_tool.authorize(
-                &PathBuf::from(path!("/root/.zed/foo/../settings.json")),
+                &PathBuf::from(path!("/root/.cognix/foo/../settings.json")),
                 &stream_tx,
                 cx,
             )
@@ -1618,11 +1618,11 @@ mod tests {
         fs.insert_tree(
             path!("/root"),
             json!({
-                ".zed": { "settings.json": "{}" },
+                ".cognix": { "settings.json": "{}" },
             }),
         )
         .await;
-        fs.insert_symlink(path!("/root/safe"), PathBuf::from(".zed"))
+        fs.insert_symlink(path!("/root/safe"), PathBuf::from(".cognix"))
             .await;
         let (edit_tool, _project, _action_log, _fs, _thread) =
             setup_test_with_fs(cx, fs, &[path!("/root").as_ref()]).await;
@@ -1954,7 +1954,7 @@ mod tests {
         fs.insert_tree(
             "/workspace/shared",
             json!({
-                ".zed": {
+                ".cognix": {
                     "settings.json": "{}"
                 }
             }),
@@ -1975,7 +1975,7 @@ mod tests {
             ("frontend/src/main.js", false, "File in first worktree"),
             ("backend/src/main.rs", false, "File in second worktree"),
             (
-                "shared/.zed/settings.json",
+                "shared/.cognix/settings.json",
                 true,
                 ".zed file in third worktree",
             ),
@@ -2012,11 +2012,11 @@ mod tests {
         fs.insert_tree(
             "/project",
             json!({
-                ".zed": {
+                ".cognix": {
                     "settings.json": "{}"
                 },
                 "src": {
-                    ".zed": {
+                    ".cognix": {
                         "local.json": "{}"
                     }
                 }
@@ -2073,7 +2073,7 @@ mod tests {
             "/project",
             json!({
                 "existing.txt": "content",
-                ".zed": {
+                ".cognix": {
                     "settings.json": "{}"
                 }
             }),
@@ -2088,7 +2088,7 @@ mod tests {
             // Test .zed path with different modes
             let (stream_tx, mut stream_rx) = ToolCallEventStream::test();
             let _auth = cx.update(|cx| {
-                edit_tool.authorize(&PathBuf::from("project/.zed/settings.json"), &stream_tx, cx)
+                edit_tool.authorize(&PathBuf::from("project/.cognix/settings.json"), &stream_tx, cx)
             });
 
             stream_rx.expect_authorization().await;

@@ -4,10 +4,10 @@ use gpui::{App, ClipboardItem, PromptLevel, actions};
 use system_specs::{CopySystemSpecsIntoClipboard, SystemSpecs};
 use util::ResultExt;
 use workspace::Workspace;
-use zed_actions::feedback::{EmailZed, FileBugReport, RequestFeature};
+use zed_actions::feedback::{EmailCognix, FileBugReport, RequestFeature};
 
 actions!(
-    zed,
+    cognix,
     [
         /// Opens the Zed repository on GitHub.
         OpenZedRepo,
@@ -96,7 +96,7 @@ pub fn init(cx: &mut App) {
                 })
                 .detach();
             })
-            .register_action(move |_, _: &EmailZed, window, cx| {
+            .register_action(move |_, _: &EmailCognix, window, cx| {
                 let specs =
                     SystemSpecs::new(window, cx, telemetry::os_name(), telemetry::os_version());
                 cx.spawn_in(window, async move |_, cx| {

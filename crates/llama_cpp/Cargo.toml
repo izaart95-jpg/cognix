@@ -13,12 +13,13 @@ path = "src/llama_cpp.rs"
 
 [features]
 default = []
-schemars = ["dep:schemars"]
+schemars = ["dep:schemars", "openai_protocol/schemars"]
 
 [dependencies]
 anyhow.workspace = true
 futures.workspace = true
 http_client.workspace = true
+openai_protocol.workspace = true
 language_model_core.workspace = true
 schemars = { workspace = true, optional = true }
 serde.workspace = true
